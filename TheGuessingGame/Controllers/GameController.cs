@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TheGuessingGame.Models;
 using TheGuessingGame.Services;
@@ -13,58 +14,75 @@ namespace TheGuessingGame.Controllers
     [Produces("application/json")]
     public class GameController : ControllerBase
     {
-        private readonly SeedData _seedDataService;
-        static readonly Random rnd = new Random();
+        private readonly GameService _gameService;
 
 
-        public GameController(SeedData seedDataService) {
+        public GameController(GameService gameService) {
 
-            _seedDataService = seedDataService;
-        }
-
-        // GET api/values
-        [HttpGet("setup")]
-        public async Task<IEnumerable<Employee>> GetAsync()
-        {
-            var employees = await _seedDataService.GetSeedData();
-
-            var limit = employees.OrderBy(x => rnd.Next()).Take(5);
-
-
-            return limit;
-        }
-
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
+            _gameService = gameService;
         }
 
 
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
-        {
-            return "value";
-        }
 
-        // POST api/values
+        // POST game 
+        // starts new game
         [HttpPost]
-        public void Post([FromBody] string value)
+        [ProducesResponseType(typeof(Game), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Post()
         {
+            var game = await _gameService.Create();
+
+            return CreatedAtAction(nameof(Get), new { game.Id }, game);
+
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        // GET game/id
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(Game), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult Get(int id)
         {
+            var game = _gameService.CachedGames.Find(x => x.Id == id);
+
+            if (game == null) {
+                return NotFound();
+            }
+
+            return Ok(game);
         }
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+
+        [HttpPost("{id}/guess")]
+        [ProducesResponseType(typeof(Guess), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult Post([FromRoute] int gameId, [FromBody] Dictionary<string,string> guess)
         {
+            var result = _gameService.AddGuess(gameId, guess);
+
+            if (result == null) {
+                BadRequest();
+            }
+
+            return CreatedAtAction(nameof(Get), new { result.Id }, result);
+
         }
+
+        [HttpGet("{id}/guess/{guessId}")]
+        [ProducesResponseType(typeof(Game), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult Get([FromRoute] int gameId, [FromRoute] int guessId)
+        {
+            var result = _gameService.RetrieveGuess(gameId, guessId);
+
+            if (result == null) {
+                return NotFound();
+            }
+
+            return Ok(result);
+
+        }
+
     }
 }

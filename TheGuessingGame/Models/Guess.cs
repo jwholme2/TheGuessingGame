@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace TheGuessingGame.Models
 {
     /// <summary>
-    /// Represents a guess from a user
+    /// Represents a guess.
     /// </summary>
     public class Guess
     {
@@ -23,6 +23,6 @@ namespace TheGuessingGame.Models
         /// <summary>
         /// Collection of answers.
         /// </summary>
-        public List<bool> Grades { get; set; } = new List<bool>();
+        public IList<bool> Grades { get; set; } = new List<bool>();
     }
 }

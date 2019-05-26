@@ -8,22 +8,24 @@ using TheGuessingGame.Models;
 
 namespace TheGuessingGame.Services
 {
-    public class GameService
+    public class GameService : IGameService
     {
-        private SeedData _seedData;
+        private readonly ISeedService<Employee> _seedData;
 
-        public GameService(SeedData seedData) {
+        public GameService(ISeedService<Employee> seedData)
+        {
             _seedData = seedData;
         }
-        public List<Game> CachedGames { get; set; } = new List<Game>();
+        public IList<Game> CachedGames { get; set; } = new List<Game>();
 
         /// <summary>
         /// Creates game with preloaded data.
         /// </summary>
         /// <returns></returns>
-        public async Task<Game> Create() {
+        public async Task<Game> Create()
+        {
             var id = CachedGames.Count;
-            var newGame = new Game() { Id = id};
+            var newGame = new Game() { Id = id };
             newGame.Data = await _seedData.RetrieveData();
             CachedGames.Add(newGame);
 
@@ -31,12 +33,19 @@ namespace TheGuessingGame.Services
 
         }
 
-        public async Task<Guess> AddGuess(int gameId, Dictionary<string,string> guess)
+        public async Task<Guess> AddGuess(int gameId, Dictionary<string, string> guess)
         {
 
-            var game = CachedGames.Find(x => Equals(x.Id, gameId));
+            var game = CachedGames.SingleOrDefault(x => Equals(x.Id, gameId));
 
-            if (game == null) {
+            if (game == null)
+            {
+                return null;
+            }
+
+            var isValidGuess = guess.Keys.Intersect(game.Data.Select(x => x.Id)).Count() == guess.Keys.Count();
+
+            if (!isValidGuess) {
                 return null;
             }
 
@@ -45,32 +54,33 @@ namespace TheGuessingGame.Services
                 Id = game.Guesses.Count,
             };
 
-            foreach (var key in guess) {
+            foreach (var key in guess)
+            {
                 newGuess.Attempts.Add(key.Key, key.Value);
             }
 
             var results = await CheckGuess(newGuess.Attempts);
 
-            newGuess.Grades.AddRange(results);
+            newGuess.Grades = new List<bool>(results);
 
             return newGuess;
 
         }
 
-        public async Task<List<bool>> CheckGuess(Dictionary<string,string> attempts)
+        public async Task<IList<bool>> CheckGuess(Dictionary<string, string> attempts)
         {
-            var employees = _seedData.CachedEmployees;
+            var employees = _seedData.Cache;
 
             if (employees == null || employees.Count == 0)
             {
-                await _seedData.GetSeedData();
+                await _seedData.RefreshCache();
             }
 
             var gradedGuess = new List<bool>();
 
             foreach (var guess in attempts)
             {
-                var employee = _seedData.CachedEmployees.Find(x => x.Id == guess.Key);
+                var employee = _seedData.Cache.SingleOrDefault(x => x.Id == guess.Key);
                 gradedGuess.Add(employee?.FirstName == guess.Value);
             }
 
@@ -80,16 +90,17 @@ namespace TheGuessingGame.Services
 
         public Guess RetrieveGuess(int gameId, int guessId)
         {
-            var game = CachedGames.Find(x => Equals(x.Id, gameId));
+            var game = CachedGames.SingleOrDefault(x => Equals(x.Id, gameId));
 
             if (game == null)
             {
                 return null;
             }
 
-            var guess = game.Guesses.Find(x => x.Id == guessId);
+            var guess = game.Guesses.SingleOrDefault(x => x.Id == guessId);
 
-            if (guess == null) {
+            if (guess == null)
+            {
                 return null;
             }
 

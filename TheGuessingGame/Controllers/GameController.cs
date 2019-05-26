@@ -16,14 +16,10 @@ namespace TheGuessingGame.Controllers
     {
         private readonly GameService _gameService;
 
-
         public GameController(GameService gameService) {
 
             _gameService = gameService;
         }
-
-
-
 
         // POST game 
         // starts new game
@@ -35,7 +31,6 @@ namespace TheGuessingGame.Controllers
             var game = await _gameService.Create();
 
             return CreatedAtAction(nameof(Get), new { game.Id }, game);
-
         }
 
         // GET game/id
@@ -44,7 +39,7 @@ namespace TheGuessingGame.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Get(int id)
         {
-            var game = _gameService.CachedGames.Find(x => x.Id == id);
+            var game = _gameService.CachedGames.SingleOrDefault(x => x.Id == id);
 
             if (game == null) {
                 return NotFound();

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using TheGuessingGame.Models;
 using TheGuessingGame.Services;
 
 namespace TheGuessingGame
@@ -27,8 +28,9 @@ namespace TheGuessingGame
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddSingleton<SeedData>();
-            services.AddSingleton<GameService>();
+            services.AddSingleton <ISeedService<Employee>, SeedData>();
+            services.AddSingleton<IGameService, GameService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

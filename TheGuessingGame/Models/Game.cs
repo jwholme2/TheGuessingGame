@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace TheGuessingGame.Models
 {
+    /// <summary>
+    /// Represents a game.
+    /// </summary>
     public class Game
     {
         /// <summary>
@@ -15,11 +18,11 @@ namespace TheGuessingGame.Models
         /// <summary>
         /// Seed data for the <see cref="Game"/>.
         /// </summary>
-        public List<Employee> Data {get;set;}
+        public IList<Employee> Data {get;set;}
 
         /// <summary>
         /// A collection of <see cref="Guess"/>. 
         /// </summary>
-        public List<Guess> Guesses { get; set; } = new List<Guess>();
+        public IList<Guess> Guesses { get; set; } = new List<Guess>();
     }
 }

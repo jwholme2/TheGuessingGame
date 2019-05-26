@@ -1,6 +1,12 @@
 # TheGuessingGame
 Welcome! 
 
+TheGuessingGame backend API is hosted here:http://wtinterviewproject.azurewebsites.net/
+
+API documentation is available here: https://documenter.getpostman.com/view/867380/S1TR5zry?version=latest
+
+Enjoy!
+
 ## Local builds
 ### Requirements
 - Requires VS 2019 and ASP.NET Core 2.1 installed. 

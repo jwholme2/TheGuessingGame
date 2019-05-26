@@ -22,8 +22,12 @@ Enjoy!
 - Use Add guess to add a set of guesses. Guesses are in id:name format, where the id is the id of the employee and name is thte first name. An example request URL is {{URL}}/game/5/guess, where 5 is the game id.
 - Use the Get grades request to get a list of grades for your previously submitted guess. Example request URL is {{URL}}/game/5/guess/0, where 5 is the game id and 0 is the guess id.
 
+## Tests
+There are several unit tests available. Use the VisualStudio Test Runner to execute.
+
 ## Improvements and TODOs
 - Allow a numberOfQuestion parameters on the Create game post that allows the client to adjust the number of employees associated with a game. Currently, 5 employees are returend per game.
 - Add additional unit tests.
 - Add a user registration step. One thought here is to use IdentityServer and hookup a 3rd party identity provider (e.g. Google). 
 - Add a PUT endpoint where the user can modify their guess.
+

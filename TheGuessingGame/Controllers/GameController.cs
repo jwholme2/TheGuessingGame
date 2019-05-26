@@ -66,9 +66,9 @@ namespace TheGuessingGame.Controllers
         [HttpGet("{id}/guess/{guessId}")]
         [ProducesResponseType(typeof(Game), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult Get([FromRoute] int gameId, [FromRoute] int guessId)
+        public IActionResult Get([FromRoute] int id, [FromRoute] int guessId)
         {
-            var result = _gameService.RetrieveGuess(gameId, guessId);
+            var result = _gameService.RetrieveGuess(id, guessId);
 
             if (result == null) {
                 return NotFound();

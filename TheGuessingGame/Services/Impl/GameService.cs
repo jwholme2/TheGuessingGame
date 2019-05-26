@@ -63,6 +63,8 @@ namespace TheGuessingGame.Services
 
             newGuess.Grades = new List<bool>(results);
 
+            game.Guesses.Add(newGuess);
+
             return newGuess;
 
         }

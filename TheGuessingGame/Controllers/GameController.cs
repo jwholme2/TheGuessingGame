@@ -14,9 +14,9 @@ namespace TheGuessingGame.Controllers
     [Produces("application/json")]
     public class GameController : ControllerBase
     {
-        private readonly GameService _gameService;
+        private readonly IGameService _gameService;
 
-        public GameController(GameService gameService) {
+        public GameController(IGameService gameService) {
 
             _gameService = gameService;
         }
@@ -48,16 +48,15 @@ namespace TheGuessingGame.Controllers
             return Ok(game);
         }
 
-
         [HttpPost("{id}/guess")]
         [ProducesResponseType(typeof(Guess), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult Post([FromRoute] int gameId, [FromBody] Dictionary<string,string> guess)
+        public async Task<IActionResult> Post([FromRoute] int id, [FromBody] Dictionary<string,string> guess)
         {
-            var result = _gameService.AddGuess(gameId, guess);
+            var result = await _gameService.AddGuess(id, guess);
 
             if (result == null) {
-                BadRequest();
+                return BadRequest();
             }
 
             return CreatedAtAction(nameof(Get), new { result.Id }, result);

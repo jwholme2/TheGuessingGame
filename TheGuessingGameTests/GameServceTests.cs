@@ -1,5 +1,4 @@
 using Moq;
-using System;
 using System.Collections.Generic;
 using TheGuessingGame.Models;
 using TheGuessingGame.Services;
@@ -10,7 +9,7 @@ namespace TheGuessingGameTests
     public class GameServiceTests
     {
         [Fact]
-        public async void Create_ReturnsGame()
+        public async void Create_ReturnsNewGame()
         {
             //Arrange
             var seedService = new Mock<ISeedService<Employee>>();
@@ -34,22 +33,22 @@ namespace TheGuessingGameTests
         }
 
         [Fact]
-        public async void Create_GuessWithInvalidIds_ReturnsNull()
+        public async void AddGuess_GuessWithIdsNotInEmployeeData_ReturnsNull()
         {
             //Arrange
             var seedService = new Mock<ISeedService<Employee>>();
 
             var employees = new List<Employee>();
-
             var employee = new Employee() { Id = "abc" };
             var employee2 = new Employee() { Id = "def" };
-
             employees.Add(employee);
             employees.Add(employee2);
 
-            seedService.SetupGet(x => x.Cache).Returns(employees).Verifiable();
+            var game = new Game() { Data = employees, Id = 0 };
 
             var gameService = new GameService(seedService.Object);
+
+            gameService.CachedGames.Add(game);
 
             var guess = new Dictionary<string, string>
             {
@@ -60,9 +59,8 @@ namespace TheGuessingGameTests
             //Act
             var result = await gameService.AddGuess(0, guess);
 
-
-
             //Assert
+            Assert.Null(result);
         }
     }
 }
